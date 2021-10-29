@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    
+    <title>Admin Panel</title>
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.3.1/css/all.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Comfortaa">
+    <link rel="stylesheet" href="admin panel new css.css">
+</head>
+
+<body>
+    <div class="container">
+
+        <div style="background-color: rgb(100, 35, 35);" class="sideArea">
+            <div class="avatar">
+                <img src="user icon.png" alt="">
+                <div class="avatarName">Welcome,<br>Admin</div>
+            </div>
+            <ul class="sideMenu">
+                <li><a href="javascript:void(0)" class="has-submenu"><span class="fa fa-table"></span>All Products</a>
+                </li>
+                <li><a href="javascript:void(0)" class="has-submenu track"><span
+                            class="fa fa-address-book"></span>Track
+                        Orders</a>
+                </li>
+            </ul>
+        </div>
+ 
+        <div class="mainArea">
+           
+            <div class="mainContent">
+              
+                <form action="addProduct.php" method="POST" enctype="multipart/form-data" class="form">
+                    <div class="formHeader row">
+                        <h2 class="text-1 fl">ADD NEW PRODUCT </h2>
+                        <div class="fr">
+                            <button style="background-color: rgb(69, 141, 163);" type="submit"
+                                class="btnSave bg-1 text-fff text-bold fr">SAVE</button>
+                        </div>
+                    </div>
+                    <div class="formBody row">
+                        <div class="column s-6">
+                            <label class="inputGroup">
+                                <span>Product Name</span>
+                                <span><input type="text" name="name"></span>
+                            </label>
+                           
+                            <label class="inputGroup">
+                                <span> New Price</span>
+                                <span><input type="text" name="price"></span>
+                            </label>
+                            <label class="inputGroup">
+                                <span>Old Price</span>
+                                <span><input type="text" name="prev"></span>
+                            </label>
+                        </div>
+                        <div class="column s-6">
+                            
+                            <label class="inputGroup">
+                                <span>Image</span>
+                                <span><input type="text" name="imageInput"></span>
+                            </label>
+                        </div>
+                        <div class="column">
+                            <label class="inputGroup">
+                                <span>Description of the Product</span>
+                                <textarea name="description"></textarea>
+                            </label>
+                        </div>
+                    </div>
+                </form>
+
+               
+              
+
+            </div>
+       
+        </div>
+    </div>
+
+
+    <script>
+
+        $('.track').on('click', function () {
+            window.location.href = 'adminTrack.html';
+        });
+
+        init();
+
+        function init() {
+            getAllItems();
+        }
+
+        $(document.body).on('click', '.itemRow', function () {
+            console.log(this.id);
+            sessionStorage.setItem('selectedAdminItem', this.id);
+            window.location.href = "Admin_update.html";
+        });
+
+       
+
+       
+        function elm(x) {
+            var target = x.substring(1);
+            var type = x.charAt(0);
+            if (type == '#') {
+                return document.getElementById(target);
+            } else if (type == '.') {
+                return document.getElementsByClassName(target);
+            } else {
+                return document.getElementsByTagName(x);
+            }
+        }
+
+
+
+   
+        window.onclick = function () {
+            elm(".accountLinks")[0].style.display = 'none';
+        };
+
+        // SUB MENU
+        if (elm(".has-submenu")) {
+            for (var i = 0, len = elm(".has-submenu").length; i < len; i++) {
+                elm(".has-submenu")[i].onclick = function (e) {
+                    e.stopPropagation();
+                    // toggle(this.nextElementSibling);
+                }
+            }
+        }
+
+        // BTN SWITCH
+        if (elm(".checkAll") != undefined) {
+            for (var i = 0, len = elm(".checkAll").length; i < len; i++) {
+                var target = elm(".checkAll")[i].getAttribute("target");
+                if (elm(target)[i] != undefined) {
+                    elm(".checkAll")[i].onchange = function () {
+                        var checked = this.checked;
+                        for (var i = 0, len = elm(target).length; i < len; i++) {
+                            elm(target)[i].checked = checked;
+                        }
+                    }
+                }
+            }
+        }
+
+        // MENU ICON CLICK
+        if (elm(".menuIcon")) {
+            elm(".menuIcon")[0].onclick = function () {
+                elm(".container")[0].classList.toggle("is-click");
+            };
+        }
+
+        // INPUT IMG
+        function getImg(x) {
+            if (x.files.length > 0) {
+                var fr = new FileReader();
+                var imgSrc = null;
+                var parent = x.parentElement;
+                fr.onload = function (e) {
+                    imgSrc = e.target.result;
+                    if (parent.getElementsByTagName("img").length > 0) {
+                        parent.removeChild(parent.getElementsByTagName("img")[0]);
+                    }
+                    var img = document.createElement("img");
+                    img.setAttribute("src", imgSrc);
+                    img.style.width = "80px";
+                    img.style.verticalAlign = "top";
+                    parent.appendChild(img);
+                }
+                fr.readAsDataURL(x.files[0]);
+            }
+        }
+
+        // NEW INPUT
+        for (var i = 0, len = elm(".btnNewInput").length; i < len; i++) {
+            elm(".btnNewInput")[i].onclick = function () {
+                findClosest(this, elm(".inputGroup")).nextElementSibling.classList.remove("hide");
+            };
+        }
+
+        // SUB LIST
+        if (elm(".btnCaret")) {
+            for (var i = 0, len = elm(".btnCaret").length; i < len; i++) {
+                elm(".btnCaret")[i].onclick = function () {
+                    var row = findClosest(this, elm(".row"));
+                    row.classList.toggle("is-active");
+                }
+            }
+        }
+        if (elm(".caretAll")) {
+            for (var i = 0, len = elm(".caretAll").length; i < len; i++) {
+                elm(".caretAll")[i].onchange = function () {
+                    var stt = this.checked;
+                    var table = findClosest(this, elm(".table"));
+                    var row = findChildren(table, elm(".row"));
+                    for (var i = 0, len = row.length; i < len; i++) {
+                        if (stt) {
+                            row[i].classList.add("is-active");
+                        } else {
+                            row[i].classList.remove("is-active");
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+
+
+
+
+        //TOGGLE
+        function toggle(x) {
+            var css = window.getComputedStyle(x, null);
+            if (css.getPropertyValue("display") == 'none') {
+                x.style.display = 'block';
+            } else {
+                x.style.display = 'none';
+            }
+        }
+    </script>
+
+
+
+
+</body>
+
+</html>
